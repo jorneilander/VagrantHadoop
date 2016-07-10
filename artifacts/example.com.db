@@ -1,0 +1,13 @@
+$ORIGIN .
+$TTL 172800     ; 2 days
+example.com             IN SOA  router.example.com. 2003080800.example.com. (
+                                2012081928 ; serial
+                                7200       ; refresh (2 hours)
+                                540        ; retry (9 minutes)
+                                604800     ; expire (1 week)
+                                86400      ; minimum (1 day)
+                                )
+                        NS      router.example.com.
+$ORIGIN example.com.
+$TTL 86400      ; 1 day
+router	IN	A	10.1.0.2

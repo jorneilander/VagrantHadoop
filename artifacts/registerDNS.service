@@ -1,0 +1,10 @@
+[Unit]
+Description=Register our hostname to the DNS
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/etc/registerDNS.sh
+
+[Install]
+WantedBy=multi-user.target

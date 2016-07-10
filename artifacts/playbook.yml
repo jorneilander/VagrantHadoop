@@ -1,0 +1,81 @@
+---
+- hosts: all 
+  tasks:
+   - name: Download HDP repo
+     command: wget -nv http://public-repo-1.hortonworks.com/HDP/centos6/2.x/updates/2.4.2.0/hdp.repo -O /etc/yum.repos.d/hdp.repo
+
+   - name: Download Ambari repo
+     command: wget -nv http://public-repo-1.hortonworks.com/ambari/centos7/2.x/updates/2.2.2.0/ambari.repo -O /etc/yum.repos.d/ambari.repo
+
+   - name: Installing curl
+     yum: name=curl state=latest disable_gpg_check=yes
+
+   - name: Installing tar
+     yum: name=tar state=latest disable_gpg_check=yes
+
+   - name: Installing python 2.7
+     yum: name=python state=latest disable_gpg_check=yes
+
+   - name: Installing OpenJDK 1.8
+     yum: name=java-1.8.0-openjdk state=latest disable_gpg_check=yes
+
+   - name: Installing ntp
+     yum: name=ntp state=latest disable_gpg_check=yes
+
+   - name: Setting nr of file descriptors to 1000
+     pam_limits: domain=* limit_type=- limit_item=nofile value=10000
+
+   - name: Use ntp
+     service: name=ntpd state=started enabled=yes
+
+   - name: Disabling firewall 
+     service: name=firewalld state=stopped enabled=no
+
+   - name: Disabling SELinux
+     selinux: state=disabled
+
+
+- hosts: ambari
+  tasks:
+   - name: Install Ambari
+     yum: name=ambari-server state=latest disable_gpg_check=yes
+   - name: Running Ambari setup
+     command: ambari-server setup -sv
+   - name: Starting Ambari Server
+     service: name=ambari-server state=started enabled=yes 
+
+- hosts: masternodes,nodes
+  tasks:
+   - name: Installing Ambari agents
+     yum: name=ambari-agent state=latest disable_gpg_check=yes
+   - name: Placing Ambari Agents ini-file
+     copy: src=./ambari-agent.ini dest=/etc/ambari-agent/conf/ambari-agent.ini
+   - name: Starting Ambari Agent
+     service: name=ambari-agent state=started enabled=yes
+
+- hosts: ambari
+  tasks:
+   - name: Uploading Blueprint to Ambari
+     uri:
+        url: http://ambari.example.com:8080/api/v1/blueprints/Example
+        method: POST
+        user: admin
+        password: admin
+        body: "{{ lookup('file','ambari-blueprint2') }}"
+        force_basic_auth: yes
+        status_code: 201
+        body_format: json
+        HEADER_X-Requested-By: "ambari"
+        HEADER_Content-Type: "application/json"
+   - name: Uploading topology to Ambari
+     uri:
+        url: http://ambari.example.com:8080/api/v1/clusters/Example
+        method: POST
+        user: admin
+        password: admin
+        body: "{{ lookup('file','ambari-hosts') }}"
+        force_basic_auth: yes
+        status_code: 201
+        body_format: json
+        HEADER_X-Requested-By: "ambari"
+

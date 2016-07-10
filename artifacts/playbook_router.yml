@@ -1,0 +1,61 @@
+---
+- hosts: 127.0.0.1
+  connection: local
+  tasks: 
+   - name: Installing Bind
+     yum: name=bind state=latest disable_gpg_check=yes
+   - name: Installing DHCPD
+     yum: name=dhcp state=latest disable_gpg_check=yes
+   - name: Copying hosts file for Ansible
+     copy: src=/vagrant/artifacts/hosts dest=/etc/ansible/hosts
+   - name: Copying DHCPD config
+     copy: src=/vagrant/artifacts/dhcpd.conf dest=/etc/dhcp/dhcpd.conf
+
+   - name: Copying example.com DNS entry stuff
+     copy: src=/vagrant/artifacts/example.com.db dest=/var/named/data/example.com.db
+     
+   - name: Installing ntp
+     yum: name=ntp state=latest disable_gpg_check=yes
+   - name: Enable NTP service
+     service: name=ntpd state=started enabled=yes
+   - name: Installing vim
+     yum: name=vim state=latest disable_gpg_check=yes
+     
+
+   - name: Adding zone to interface config (internal)
+     lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-enp0s9 insertafter=EOF line="ZONE=internal"
+   - name: Adding zone to interface config (external)
+     lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-enp0s8 insertafter=EOF line="ZONE=external"
+   - name: Enabling firewalld
+     service: name=firewalld state=started enabled=yes
+   - name: Enabling masquerade for internal network
+     firewalld: masquerade=yes state=enabled permanent=true zone=internal immediate=yes
+   - name: Restarting network stack
+     service: name=network state=restarted
+   - name: Adding enp0s9 to zone internal
+     firewalld: interface=enp0s9 zone=internal state=enabled permanent=no
+   - name: Adding enp0s8 to zone external
+     firewalld: interface=enp0s8 zone=external state=enabled permanent=no
+   - name: Opening DNS for zone internal
+     firewalld: service=dns zone=internal permanent=yes immediate=yes state=enabled
+     
+   - name: Replacing listen address for bind
+     replace: dest=/etc/named.conf regexp='127.0.0.1' replace='10.1.0.2'
+   - name: Replacing query allow for bind
+     replace: dest=/etc/named.conf regexp='{ localhost; }' replace='{ 10.1.0.0/24; }'
+   
+   - name: Enabling dhcpd
+     service: name=dhcpd state=started enabled=yes
+     
+   - name: Inserting example.com stuff in named.conf
+     blockinfile:
+       dest: /etc/named.conf
+       insertafter: EOF
+       block: |
+         zone "example.com" {
+          type master;
+          file "data/example.com.db";
+          allow-update { 10.1.0.1/24; };
+         };
+   - name: Enabling service named
+     service: name=named state=started enabled=yes
