@@ -12,6 +12,8 @@ Vagrant.configure("2") do |config|
 			vb.cpus = 4
 		end
 		
+		ambari.vm.provision "shell", inline: "sudo sh /vagrant/disable_ipv6.sh"
+		
 		ambari.vm.provision "shell", inline: "sudo mkdir -p /root/.ssh"
 		ambari.vm.provision "shell", inline: "sudo cp /vagrant/id_rsa /root/.ssh/id_rsa"
 		ambari.vm.provision "shell", inline: "chmod 700 /root/.ssh/id_rsa"
@@ -34,6 +36,8 @@ Vagrant.configure("2") do |config|
 		end
 		master.vm.provision "shell", inline: "sudo mkdir -p /root/.ssh"
 		master.vm.provision "shell", inline: "sudo cat /vagrant/id_rsa.pub >> /root/.ssh/authorized_keys"
+		
+		master.vm.provision "shell", inline: "sudo sh /vagrant/disable_ipv6.sh"		
 	end
 	
 	config.vm.define "support" do |support|
@@ -44,7 +48,9 @@ Vagrant.configure("2") do |config|
 			vb.cpus = 4
 		end
 		support.vm.provision "shell", inline: "sudo mkdir -p /root/.ssh"
-		support.vm.provision "shell", inline: "sudo cat /vagrant/id_rsa.pub >> /root/.ssh/authorized_keys"			
+		support.vm.provision "shell", inline: "sudo cat /vagrant/id_rsa.pub >> /root/.ssh/authorized_keys"	
+
+		support.vm.provision "shell", inline: "sudo sh /vagrant/disable_ipv6.sh"		
 	end
 	
 	config.vm.define "node1" do |node1|
@@ -55,7 +61,9 @@ Vagrant.configure("2") do |config|
 			vb.cpus = 4
 		end
 		node1.vm.provision "shell", inline: "sudo mkdir -p /root/.ssh"
-		node1.vm.provision "shell", inline: "sudo cat /vagrant/id_rsa.pub >> /root/.ssh/authorized_keys"			
+		node1.vm.provision "shell", inline: "sudo cat /vagrant/id_rsa.pub >> /root/.ssh/authorized_keys"	
+
+		node1.vm.provision "shell", inline: "sudo sh /vagrant/disable_ipv6.sh"		
 	end
 	
 	config.vm.define "node2" do |node2|
@@ -66,7 +74,9 @@ Vagrant.configure("2") do |config|
 			vb.cpus = 4
 		end
 		node2.vm.provision "shell", inline: "sudo mkdir -p /root/.ssh"
-		node2.vm.provision "shell", inline: "sudo cat /vagrant/id_rsa.pub >> /root/.ssh/authorized_keys"			
+		node2.vm.provision "shell", inline: "sudo cat /vagrant/id_rsa.pub >> /root/.ssh/authorized_keys"		
+
+		node2.vm.provision "shell", inline: "sudo sh /vagrant/disable_ipv6.sh"		
 	end
 	
 end
