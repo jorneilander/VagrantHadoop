@@ -1,0 +1,27 @@
+#This install ambari-server
+
+- name: Disable SELinux
+  selinux: state=disabled
+
+- name: Disable Firewalld
+  service: name=firewalld state=stopped enabled=no
+
+- name: Install Ambari Server
+  yum: pkg={{ item }} state=present
+  with_items:
+    - ambari-server
+  notify: Setup Ambari Server
+
+- name: Start Ambari Server using init.d (bug)
+  shell: /etc/init.d/ambari-server restart
+  
+- name: Delete Existing Blueprint
+  shell: 'curl -XDELETE http://ambari.example.com:8080/api/v1/blueprints/Example -u admin:admin -v -H "X-Requested-By: ambari"'  
+  ignore_errors: yes
+
+- name: Upload Blueprint to Ambari
+  shell: 'curl -k -X POST -u admin:admin -H "X-Requested-By: ambari" --data "@/vagrant/roles/ambari_servers/files/blueprint.json" http://ambari.example.com:8080/api/v1/blueprints/Example -v'
+  
+- name: Upload Cluster to Ambari
+  shell: 'curl -k -X POST -u admin:admin --data "@/vagrant/roles/ambari_servers/files/ambari-hosts.json" "http://ambari.example.com:8080/api/v1/clusters/Example" -v -H "X-Requested-By: ambari"'
+  

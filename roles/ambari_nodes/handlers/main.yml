@@ -1,0 +1,3 @@
+# Handlers for Ambari Agent
+- name: Restart Ambari Agent
+  service: name=ambari-agent state=restarted

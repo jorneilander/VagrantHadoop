@@ -1,0 +1,31 @@
+#This will install ambari_agent
+
+- name: Disable Firewalld
+  service: name=firewalld state=stopped enabled=no
+  
+- name: Enable Ntpd
+  service: name=ntpd state=started enabled=yes
+  
+- name: Disable SELinux
+  selinux: state=disabled
+
+- name: Install Ambari Repo
+  get_url: 
+    url: http://public-repo-1.hortonworks.com/ambari/centos7/2.x/updates/{{ ambari_agent_version }}/ambari.repo
+    dest: /etc/yum.repos.d/ambari.repo
+    
+- name: Install HDP Repo
+  get_url:
+    url: http://public-repo-1.hortonworks.com/HDP/centos7/2.x/updates/{{ hdp_version }}/hdp.repo
+    dest: /etc/yum.repos.d/hdp.repo
+    
+- name: Install Ambari Agent
+  yum: pkg={{ item }} state=present
+  with_items:
+    - ambari-agent
+    
+- name: Place Ambari Agent Config File
+  copy: src=ambari-agent.ini dest=/etc/ambari-agent/conf/ambari-agent.ini
+
+- name: Start Ambari Agent
+  service: name=ambari-agent state=restarted

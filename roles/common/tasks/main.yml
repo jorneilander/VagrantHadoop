@@ -1,0 +1,15 @@
+#This installs all the common stuff
+
+- name: Install All Common
+  yum: state=latest pkg={{ item }}
+  with_items:
+    - python
+    - java-1.8.0-openjdk
+    - ntp
+    - curl
+    - vim
+    - net-tools
+    - htop
+    
+- name: Placing Hosts File
+  copy: src=hosts dest=/etc/hosts

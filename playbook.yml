@@ -1,0 +1,8 @@
+- hosts: All
+  roles:
+    - common
+    - ambari_nodes
+
+- hosts: Ambari
+  roles:
+    - ambari_servers

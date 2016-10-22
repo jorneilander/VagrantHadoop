@@ -1,0 +1,5 @@
+- name: Restart Ambari Server
+  shell: /etc/init.d/ambari-server restart
+  
+- name: Setup Ambari Server
+  shell: ambari-server setup -sv
