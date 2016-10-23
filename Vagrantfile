@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
 		ambari.vm.network "private_network", ip: "10.1.0.2", virtualbox__intnet: "mynetwork"
 		
 		ambari.vm.provider "virtualbox" do |vb|
-			vb.memory = 1024
+			vb.memory = 2560
 			vb.cpus = 4
 		end
 		
@@ -31,7 +31,7 @@ Vagrant.configure("2") do |config|
 		master.vm.hostname = "master.example.com"
 		master.vm.network "private_network", ip: "10.1.0.3", virtualbox__intnet: "mynetwork"
 		master.vm.provider "virtualbox" do |vb|
-			vb.memory = 1024
+			vb.memory = 2560
 			vb.cpus = 4
 		end
 		master.vm.provision "shell", inline: "sudo mkdir -p /root/.ssh"
@@ -44,7 +44,7 @@ Vagrant.configure("2") do |config|
 		support.vm.hostname = "support.example.com"
 		support.vm.network "private_network", ip: "10.1.0.4", virtualbox__intnet: "mynetwork"
 		support.vm.provider "virtualbox" do |vb|
-			vb.memory = 1024
+			vb.memory = 2560
 			vb.cpus = 4
 		end
 		support.vm.provision "shell", inline: "sudo mkdir -p /root/.ssh"
@@ -57,7 +57,7 @@ Vagrant.configure("2") do |config|
 		node1.vm.hostname = "node1.example.com"
 		node1.vm.network "private_network", ip: "10.1.0.5", virtualbox__intnet: "mynetwork"
 		node1.vm.provider "virtualbox" do |vb|
-			vb.memory = 1024
+			vb.memory = 2560
 			vb.cpus = 4
 		end
 		node1.vm.provision "shell", inline: "sudo mkdir -p /root/.ssh"
@@ -70,7 +70,7 @@ Vagrant.configure("2") do |config|
 		node2.vm.hostname = "node2.example.com"
 		node2.vm.network "private_network", ip: "10.1.0.6", virtualbox__intnet: "mynetwork"
 		node2.vm.provider "virtualbox" do |vb|
-			vb.memory = 1024
+			vb.memory = 2560
 			vb.cpus = 4
 		end
 		node2.vm.provision "shell", inline: "sudo mkdir -p /root/.ssh"

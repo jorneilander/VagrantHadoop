@@ -1,5 +1,5 @@
-10.1.0.2	ambari ambari.example.com
-10.1.0.3	master master.example.com
-10.1.0.4	support support.example.com
-10.1.0.5	node1 node1.example.com
-10.1.0.6	node2 node2.example.com
+10.1.0.2	ambari.example.com
+10.1.0.3	master.example.com
+10.1.0.4	support.example.com
+10.1.0.5	node1.example.com
+10.1.0.6	node2.example.com

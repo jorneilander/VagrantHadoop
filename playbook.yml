@@ -1,8 +1,12 @@
 - hosts: All
   roles:
     - common
-    - ambari_nodes
+    - ambari_node
 
+- hosts: kdc
+  roles:
+    - kdc
+    
 - hosts: Ambari
   roles:
-    - ambari_servers
+    - ambari_server

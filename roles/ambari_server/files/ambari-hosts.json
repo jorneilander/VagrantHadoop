@@ -1,0 +1,49 @@
+{
+	"blueprint": "Example",
+	"default_password": "admin",
+	"credentials": [
+		{
+			"alias": "kdc.admin.credential",
+			"principal": "ambari/admin@EXAMPLE.COM",
+			"key": "password",
+			"type": "temporary"
+		}
+	],
+	"host_groups": [
+		{
+			"name": "host_group_1",
+			"hosts": [
+				{
+					"fqdn": "ambari.example.com"
+				}
+			]
+		},
+		{
+			"name": "host_group_2",
+			"hosts": [
+				{
+					"fqdn": "master.example.com"
+				}
+			]
+		},
+		{
+			"name": "host_group_3",
+			"hosts": [
+				{
+					"fqdn": "node1.example.com"
+				},
+				{
+					"fqdn": "node2.example.com"
+				}
+			]
+		},
+		{
+			"name": "host_group_4",
+			"hosts": [
+				{
+					"fqdn": "support.example.com"
+				}
+			]
+		}
+	]
+}

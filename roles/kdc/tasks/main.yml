@@ -1,0 +1,32 @@
+#This install the Kerberos Key Distribution Center
+
+- name: Install Kerberos Server
+  yum: pkg={{ item }} state=present
+  with_items:
+    - krb5-server
+    - krb5-workstation
+
+- name: Copy krb5.conf
+  copy: src=/vagrant/roles/kdc/files/krb5.conf dest=/etc/krb5.conf
+  
+- name: Copy kdc.conf
+  copy: src=/vagrant/roles/kdc/files/kdc.conf dest=/var/kerberos/krb5kdc/kdc.conf 
+    
+- name: Create Realm EXAMPLE.COM
+  shell: 'kdb5_util create -r EXAMPLE.COM -s -P password'
+
+- name: Add kadmin/admin to Keytab
+  shell: 'echo "ktadd -k /var/kerberos/krb5kdc/kadm5.keytab kadmin/admin" | kadmin.local'
+
+- name: Add kadmin/changepw to Keytab
+  shell: 'echo "ktadd -k /var/kerberos/krb5kdc/kadm5.keytab kadmin/changepw" | kadmin.local'
+  
+- name: Create ambari/admin Principal
+  shell: 'echo "addprinc -pw password ambari/admin" | kadmin.local'
+
+- name: Start KDC
+  service: name=krb5kdc state=started enabled=yes
+
+- name: Start kadmin
+  service: name=kadmin state=started enabled=yes
+
