@@ -5,6 +5,10 @@
   with_items:
     - krb5-server
     - krb5-workstation
+    - haveged
+    
+- name: Start Entropy Generator (haveged)
+  service: name=haveged state=started enabled=yes
 
 - name: Copy krb5.conf
   copy: src=/vagrant/roles/kdc/files/krb5.conf dest=/etc/krb5.conf

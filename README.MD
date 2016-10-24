@@ -5,7 +5,7 @@ Steps:
 - Install Vagrant (http://www.vagrantup.com)
 - Install VirtualBox (http://www.virtualbox.org)
 
-Extract the project files into your desired directory
+Extract the project files into your desired directory  
 Run these commands in order:
 
 ```
@@ -25,5 +25,7 @@ To connect to Ambari using your browser:
 	+ Destination: 10.1.0.2:8080
 	+ Click [Add]
 	
-Now when you brose to http://127.0.0.1:8888 after Ansible is done, Ambari should pop-up
-Username and password are "admin"
+Now when you brose to http://127.0.0.1:8888 after Ansible is done, Ambari should pop-up  
+Username and password are "admin"  
+
+Don't forget to scale your machines for your hardware in Vagrantfile

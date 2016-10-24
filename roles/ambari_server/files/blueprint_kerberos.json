@@ -1033,7 +1033,7 @@
         "properties" : {
 		  "realm" : "EXAMPLE.COM",
 		  "kdc_type" : "mit-kdc",
-		  "kdc_host" : "ambari.example.com",
+		  "kdc_hosts" : "ambari.example.com",
 		  "admin_server_host" : "ambari.example.com",
 		  "create_attributes_template" : "",
 		  "container_dn" : "",
