@@ -1,0 +1,17 @@
+[root@ambari ~]# ambari-server setup --jdbc-db=postgres --jdbc-driver=/usr/lib/ambari-server/postgresql-9.3-1101-jdbc4.jar
+
+ambari/admin@EXAMPLE.COM
+
+curl -k -X GET http://ambari.example.com:8080/api/v1/clusters/Example?format=blueprint  -u admin:admin -v -H "X-Requested-By: ambari"
+curl -k -X DELETE http://ambari.example.com:8080/api/v1/clusters/Example  -u admin:admin -v -H "X-Requested-By: ambari"
+curl -H "X-Requested-By:ambari" -u admin:admin -X DELETE  http://ambari.example.com:8080/api/v1/clusters/Example/credentials/kdc.admin.credential -v
+curl -k -X DELETE http://ambari.example.com:8080/api/v1/blueprints/Example  -u admin:admin -v -H "X-Requested-By: ambari"
+
+curl -k -X POST --data "@/vagrant/roles/ambari_server/files/blueprint_kerberos.json" http://ambari.example.com:8080/api/v1/blueprints/Example -u admin:admin -v -H "X-Requested-By: ambari"
+curl -k -X POST --data "@/vagrant/roles/ambari_server/files/ambari-hosts.json" http://ambari.example.com:8080/api/v1/clusters/Example -u admin:admin -v -H "X-Requested-By: ambari"
+
+ssh root@ambari.example.com systemctl restart ambari-agent
+ssh root@master.example.com systemctl restart ambari-agent
+ssh root@support.example.com systemctl restart ambari-agent
+ssh root@node1.example.com systemctl restart ambari-agent
+ssh root@node2.example.com systemctl restart ambari-agent

@@ -17,6 +17,9 @@
     {
       "ams-hbase-site" : {
         "properties_attributes" : {
+          "hbase.zookeeper.quorum" : {
+            "final" : "true"
+          },
           "final" : {
             "hbase.zookeeper.quorum" : "true"
           }
@@ -120,6 +123,15 @@
       }
     },
     {
+      "infra-solr-client-log4j" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "content" : "# Copyright 2011 The Apache Software Foundation\n#\n# Licensed to the Apache Software Foundation (ASF) under one\n# or more contributor license agreements.  See the NOTICE file\n# distributed with this work for additional information\n# regarding copyright ownership.  The ASF licenses this file\n# to you under the Apache License, Version 2.0 (the\n# \"License\"); you may not use this file except in compliance\n# with the License.  You may obtain a copy of the License at\n#\n#     http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n\nlog4j.rootLogger=INFO,file,stdout,stderr\n\nlog4j.appender.file=org.apache.log4j.RollingFileAppender\nlog4j.appender.file.File={{infra_client_log|default('/var/log/ambari-infra-solr-client/solr-client.log')}}\nlog4j.appender.file.MaxFileSize=80MB\nlog4j.appender.file.MaxBackupIndex=60\nlog4j.appender.file.layout=org.apache.log4j.PatternLayout\nlog4j.appender.file.layout.ConversionPattern=%d{DATE} %5p [%t] %c{1}:%L - %m%n\n\nlog4j.appender.stdout=org.apache.log4j.ConsoleAppender\nlog4j.appender.stdout.Threshold=INFO\nlog4j.appender.stdout.Target=System.out\nlog4j.appender.stdout.layout=org.apache.log4j.PatternLayout\nlog4j.appender.stdout.layout.ConversionPattern=%m%n\n\nlog4j.appender.stderr=org.apache.log4j.ConsoleAppender\nlog4j.appender.stderr.Threshold=ERROR\nlog4j.appender.stderr.Target=System.err\nlog4j.appender.stderr.layout=org.apache.log4j.PatternLayout\nlog4j.appender.stderr.layout.ConversionPattern=%m%n",
+          "infra_solr_client_log_dir" : "/var/log/ambari-infra-solr-client"
+        }
+      }
+    },
+    {
       "ranger-yarn-policymgr-ssl" : {
         "properties_attributes" : { },
         "properties" : {
@@ -204,11 +216,19 @@
           "xasecure.audit.destination.hdfs.dir" : "hdfs://%HOSTGROUP::host_group_2%:8020/ranger/audit",
           "xasecure.audit.jaas.Client.option.principal" : "rm/_HOST@EXAMPLE.COM",
           "xasecure.audit.destination.solr.force.use.inmemory.jaas.config" : "true",
-          "xasecure.audit.destination.solr" : "false",
-          "xasecure.audit.destination.solr.zookeepers" : "NONE",
+          "xasecure.audit.destination.solr" : "true",
+          "xasecure.audit.destination.solr.zookeepers" : "ambari.example.com:2181/infra-solr",
           "xasecure.audit.provider.summary.enabled" : "false",
           "xasecure.audit.jaas.Client.option.storeKey" : "false",
           "xasecure.audit.destination.solr.urls" : ""
+        }
+      }
+    },
+    {
+      "infra-solr-log4j" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "content" : "# Licensed to the Apache Software Foundation (ASF) under one or more\n# contributor license agreements.  See the NOTICE file distributed with\n# this work for additional information regarding copyright ownership.\n# The ASF licenses this file to You under the Apache License, Version 2.0\n# (the \"License\"); you may not use this file except in compliance with\n# the License.  You may obtain a copy of the License at\n#\n#     http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n\n#  Logging level\ninfra.solr.log.dir={{infra_solr_log_dir}}\n#log4j.rootLogger=INFO, file, CONSOLE\nlog4j.rootLogger=WARN, file\n\nlog4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender\n\nlog4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout\nlog4j.appender.CONSOLE.layout.ConversionPattern=%-4r [%t] %-5p %c %x [%X{collection} %X{shard} %X{replica} %X{core}] \\u2013 %m%n\n\n#- size rotation with log cleanup.\nlog4j.appender.file=org.apache.log4j.RollingFileAppender\nlog4j.appender.file.MaxFileSize=10MB\nlog4j.appender.file.MaxBackupIndex=9\n\n#- File to log to and log format\nlog4j.appender.file.File=${infra.solr.log.dir}/solr.log\nlog4j.appender.file.layout=org.apache.log4j.PatternLayout\nlog4j.appender.file.layout.ConversionPattern=%d{ISO8601} [%t] %-5p [%X{collection} %X{shard} %X{replica} %X{core}] %C (%F:%L) - %m%n\n\nlog4j.logger.org.apache.zookeeper=WARN\nlog4j.logger.org.apache.hadoop=WARN\n\n# set to INFO to enable infostream log messages\nlog4j.logger.org.apache.solr.update.LoggingInfoStream=OFF"
         }
       }
     },
@@ -304,6 +324,7 @@
           "dfs.datanode.https.address" : "0.0.0.0:50475",
           "dfs.datanode.failed.volumes.tolerated" : "0",
           "dfs.client.retry.policy.enabled" : "false",
+          "dfs.namenode.inode.attributes.provider.class" : "org.apache.ranger.authorization.hadoop.RangerHdfsAuthorizer",
           "dfs.namenode.startup.delay.block.deletion.sec" : "3600",
           "dfs.block.access.token.enable" : "true",
           "dfs.datanode.data.dir" : "/hadoop/hdfs/data",
@@ -321,7 +342,7 @@
           "dfs.namenode.checkpoint.txns" : "1000000",
           "dfs.journalnode.edits.dir" : "/hadoop/hdfs/journalnode",
           "dfs.support.append" : "true",
-          "fs.permissions.umask-mode" : "022",
+          "fs.permissions.umask-mode" : "077",
           "dfs.namenode.safemode.threshold-pct" : "1",
           "dfs.namenode.checkpoint.period" : "21600",
           "dfs.datanode.http.address" : "0.0.0.0:1022"
@@ -382,7 +403,7 @@
           "yarn.timeline-service.ttl-enable" : "true",
           "yarn.timeline-service.entity-group-fs-store.retain-seconds" : "604800",
           "yarn.log-aggregation.retain-seconds" : "2592000",
-          "yarn.nodemanager.resource.memory-mb" : "1024",
+          "yarn.nodemanager.resource.memory-mb" : "512",
           "yarn.nodemanager.disk-health-checker.min-healthy-disks" : "0.25",
           "yarn.node-labels.enabled" : "false",
           "yarn.nodemanager.log.retain-second" : "604800",
@@ -472,7 +493,7 @@
           "yarn.resourcemanager.zk-retry-interval-ms" : "1000",
           "yarn.timeline-service.keytab" : "/etc/security/keytabs/yarn.service.keytab",
           "yarn.nodemanager.remote-app-log-dir" : "/app-logs",
-          "yarn.scheduler.maximum-allocation-mb" : "1024",
+          "yarn.scheduler.maximum-allocation-mb" : "512",
           "yarn.nodemanager.vmem-check-enabled" : "false",
           "yarn.timeline-service.entity-group-fs-store.scan-interval-seconds" : "60",
           "yarn.resourcemanager.webapp.https.address" : "%HOSTGROUP::host_group_1%:8090",
@@ -560,8 +581,8 @@
           "xasecure.audit.destination.hdfs.dir" : "hdfs://%HOSTGROUP::host_group_2%:8020/ranger/audit",
           "xasecure.audit.jaas.Client.option.principal" : "nn/_HOST@EXAMPLE.COM",
           "xasecure.audit.destination.solr.force.use.inmemory.jaas.config" : "true",
-          "xasecure.audit.destination.solr" : "false",
-          "xasecure.audit.destination.solr.zookeepers" : "NONE",
+          "xasecure.audit.destination.solr" : "true",
+          "xasecure.audit.destination.solr.zookeepers" : "ambari.example.com:2181/infra-solr",
           "xasecure.audit.provider.summary.enabled" : "false",
           "xasecure.audit.jaas.Client.option.storeKey" : "false",
           "xasecure.audit.destination.solr.urls" : ""
@@ -572,8 +593,9 @@
       "ranger-hdfs-plugin-properties" : {
         "properties_attributes" : { },
         "properties" : {
-          "REPOSITORY_CONFIG_USERNAME" : "hadoop",
-          "ranger-hdfs-plugin-enabled" : "No",
+          "REPOSITORY_CONFIG_USERNAME" : "rangerhdfslookup@EXAMPLE.COM",
+		  "REPOSITORY_CONFIG_PASSWORD" : "password",
+          "ranger-hdfs-plugin-enabled" : "Yes",
           "common.name.for.certificate" : "",
           "hadoop.rpc.protection" : "authentication",
           "policy_user" : "ambari-qa"
@@ -584,6 +606,35 @@
       "usersync-properties" : {
         "properties_attributes" : { },
         "properties" : { }
+      }
+    },
+    {
+      "infra-solr-env" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "infra_solr_keystore_type" : "jks",
+          "infra_solr_kerberos_keytab" : "/etc/security/keytabs/ambari-infra-solr.service.keytab",
+          "infra_solr_keystore_location" : "/etc/security/serverKeys/infra.solr.keyStore.jks",
+          "infra_solr_truststore_type" : "jks",
+          "infra_solr_datadir" : "/opt/ambari_infra_solr/data",
+          "infra_solr_web_kerberos_keytab" : "/etc/security/keytabs/spnego.service.keytab",
+          "infra_solr_user" : "infra-solr",
+          "infra_solr_log_dir" : "/var/log/ambari-infra-solr",
+          "infra_solr_jmx_port" : "18886",
+          "infra_solr_maxmem" : "1024",
+          "content" : "#!/bin/bash\n# Licensed to the Apache Software Foundation (ASF) under one or more\n# contributor license agreements. See the NOTICE file distributed with\n# this work for additional information regarding copyright ownership.\n# The ASF licenses this file to You under the Apache License, Version 2.0\n# (the \"License\"); you may not use this file except in compliance with\n# the License. You may obtain a copy of the License at\n#\n# http://www.apache.org/licenses/LICENSE-2.0\n#\n# Unless required by applicable law or agreed to in writing, software\n# distributed under the License is distributed on an \"AS IS\" BASIS,\n# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n# See the License for the specific language governing permissions and\n# limitations under the License.\n\n# By default the script will use JAVA_HOME to determine which java\n# to use, but you can set a specific path for Solr to use without\n# affecting other Java applications on your server/workstation.\nSOLR_JAVA_HOME={{java64_home}}\n\n# Increase Java Min/Max Heap as needed to support your indexing / query needs\nSOLR_JAVA_MEM=\"-Xms{{infra_solr_min_mem}}m -Xmx{{infra_solr_max_mem}}m\"\n\n# Enable verbose GC logging\nGC_LOG_OPTS=\"-verbose:gc -XX:+PrintHeapAtGC -XX:+PrintGCDetails \\\n-XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintTenuringDistribution -XX:+PrintGCApplicationStoppedTime\"\n\n# These GC settings have shown to work well for a number of common Solr workloads\nGC_TUNE=\"-XX:NewRatio=3 \\\n-XX:SurvivorRatio=4 \\\n-XX:TargetSurvivorRatio=90 \\\n-XX:MaxTenuringThreshold=8 \\\n-XX:+UseConcMarkSweepGC \\\n-XX:+UseParNewGC \\\n-XX:ConcGCThreads=4 -XX:ParallelGCThreads=4 \\\n-XX:+CMSScavengeBeforeRemark \\\n-XX:PretenureSizeThreshold=64m \\\n-XX:+UseCMSInitiatingOccupancyOnly \\\n-XX:CMSInitiatingOccupancyFraction=50 \\\n-XX:CMSMaxAbortablePrecleanTime=6000 \\\n-XX:+CMSParallelRemarkEnabled \\\n-XX:+ParallelRefProcEnabled\"\n\n# Set the ZooKeeper connection string if using an external ZooKeeper ensemble\n# e.g. host1:2181,host2:2181/chroot\n# Leave empty if not using SolrCloud\nZK_HOST=\"{{zookeeper_quorum}}{{infra_solr_znode}}\"\n\n# Set the ZooKeeper client timeout (for SolrCloud mode)\nZK_CLIENT_TIMEOUT=\"60000\"\n\n# By default the start script uses \"localhost\"; override the hostname here\n# for production SolrCloud environments to control the hostname exposed to cluster state\n#SOLR_HOST=\"192.168.1.1\"\n\n# By default the start script uses UTC; override the timezone if needed\n#SOLR_TIMEZONE=\"UTC\"\n\n# Set to true to activate the JMX RMI connector to allow remote JMX client applications\n# to monitor the JVM hosting Solr; set to \"false\" to disable that behavior\n# (false is recommended in production environments)\nENABLE_REMOTE_JMX_OPTS=\"true\"\n\n# The script will use SOLR_PORT+10000 for the RMI_PORT or you can set it here\nRMI_PORT={{infra_solr_jmx_port}}\n\n# Anything you add to the SOLR_OPTS variable will be included in the java\n# start command line as-is, in ADDITION to other options. If you specify the\n# -a option on start script, those options will be appended as well. Examples:\n#SOLR_OPTS=\"$SOLR_OPTS -Dsolr.autoSoftCommit.maxTime=3000\"\n#SOLR_OPTS=\"$SOLR_OPTS -Dsolr.autoCommit.maxTime=60000\"\n#SOLR_OPTS=\"$SOLR_OPTS -Dsolr.clustering.enabled=true\"\n\n# Location where the bin/solr script will save PID files for running instances\n# If not set, the script will create PID files in $SOLR_TIP/bin\nSOLR_PID_DIR={{infra_solr_piddir}}\n\n# Path to a directory where Solr creates index files, the specified directory\n# must contain a solr.xml; by default, Solr will use server/solr\nSOLR_HOME={{infra_solr_datadir}}\n\n# Solr provides a default Log4J configuration properties file in server/resources\n# however, you may want to customize the log settings and file appender location\n# so you can point the script to use a different log4j.properties file\nLOG4J_PROPS={{infra_solr_conf}}/log4j.properties\n\n# Location where Solr should write logs to; should agree with the file appender\n# settings in server/resources/log4j.properties\nSOLR_LOGS_DIR={{infra_solr_log_dir}}\n\n# Sets the port Solr binds to, default is 8983\nSOLR_PORT={{infra_solr_port}}\n\n# Be sure to update the paths to the correct keystore for your environment\n{% if infra_solr_ssl_enabled %}\nSOLR_SSL_KEY_STORE={{infra_solr_keystore_location}}\nSOLR_SSL_KEY_STORE_PASSWORD={{infra_solr_keystore_password}}\nSOLR_SSL_TRUST_STORE={{infra_solr_keystore_location}}\nSOLR_SSL_TRUST_STORE_PASSWORD={{infra_solr_keystore_password}}\nSOLR_SSL_NEED_CLIENT_AUTH=false\nSOLR_SSL_WANT_CLIENT_AUTH=false\n{% endif %}\n\n# Uncomment to set a specific SSL port (-Djetty.ssl.port=N); if not set\n# and you are using SSL, then the start script will use SOLR_PORT for the SSL port\n#SOLR_SSL_PORT=\n\n{% if security_enabled -%}\nSOLR_HOST=`hostname -f`\nSOLR_JAAS_FILE={{infra_solr_jaas_file}}\nSOLR_KERB_KEYTAB={{infra_solr_web_kerberos_keytab}}\nSOLR_KERB_PRINCIPAL={{infra_solr_web_kerberos_principal}}\nSOLR_KERB_NAME_RULES={{infra_solr_kerberos_name_rules}}\n\nSOLR_AUTHENTICATION_CLIENT_CONFIGURER=\"org.apache.solr.client.solrj.impl.Krb5HttpClientConfigurer\"\nSOLR_AUTHENTICATION_OPTS=\" -DauthenticationPlugin=org.apache.solr.security.KerberosPlugin -Djava.security.auth.login.config=$SOLR_JAAS_FILE -Dsolr.kerberos.principal=${SOLR_KERB_PRINCIPAL} -Dsolr.kerberos.keytab=${SOLR_KERB_KEYTAB} -Dsolr.kerberos.cookie.domain=${SOLR_HOST} -Dsolr.kerberos.name.rules=${SOLR_KERB_NAME_RULES}\"\n{% endif %}",
+          "infra_solr_kerberos_name_rules" : "DEFAULT",
+          "infra_solr_minmem" : "512",
+          "infra_solr_port" : "8886",
+          "infra_solr_web_kerberos_principal" : "HTTP/_HOST@EXAMPLE.COM",
+          "infra_solr_pid_dir" : "/var/run/ambari-infra-solr",
+          "infra_solr_ssl_enabled" : "false",
+          "infra_solr_znode" : "/infra-solr",
+          "infra_solr_truststore_location" : "/etc/security/serverKeys/infra.solr.trustStore.jks",
+		  "infra_solr_truststore_password" : "bigdata",
+		  "infra_solr_keystore_password" : "bigdata",
+		  "infra_solr_client_log_dir" : "/var/log/ambari-infra-solr-client"
+        }
       }
     },
     {
@@ -919,7 +970,7 @@
           "ranger.ldap.user.searchfilter" : "(uid={0})",
           "ranger.plugins.hbase.serviceuser" : "hbase",
           "ranger.audit.source.type" : "solr",
-          "ranger.audit.solr.zookeepers" : "NONE",
+          "ranger.audit.solr.zookeepers" : "ambari.example.com:2181/infra-solr",
           "ranger.admin.kerberos.keytab" : "/etc/security/keytabs/rangeradmin.service.keytab",
           "ranger.externalurl" : "{{ranger_external_url}}",
           "ranger.plugins.hdfs.serviceuser" : "hdfs",
@@ -935,7 +986,7 @@
           "ranger-hive-plugin-enabled" : "No",
           "admin_username" : "admin",
           "ranger-hbase-plugin-enabled" : "No",
-          "ranger-hdfs-plugin-enabled" : "No",
+          "ranger-hdfs-plugin-enabled" : "Yes",
           "ranger_solr_config_set" : "ranger_audits",
           "xasecure.audit.destination.hdfs.dir" : "hdfs://%HOSTGROUP::host_group_2%:8020/ranger/audit",
           "ranger_privelege_user_jdbc_url" : "jdbc:postgresql://ambari.example.com:5432/postgres",
@@ -943,12 +994,12 @@
           "bind_anonymous" : "false",
           "ranger_user" : "ranger",
           "is_external_solrCloud_enabled" : "false",
-          "xasecure.audit.destination.solr" : "false",
+          "xasecure.audit.destination.solr" : "true",
           "ranger_solr_collection_name" : "ranger_audits",
           "is_external_solrCloud_kerberos" : "false",
           "ranger_group" : "ranger",
           "ranger_usersync_log_dir" : "/var/log/ranger/usersync",
-          "is_solrCloud_enabled" : "false",
+          "is_solrCloud_enabled" : "true",
           "xasecure.audit.destination.hdfs" : "true",
           "ranger_admin_log_dir" : "/var/log/ranger/admin",
           "ranger-knox-plugin-enabled" : "No",
@@ -957,6 +1008,7 @@
           "ranger-yarn-plugin-enabled" : "No",
           "ranger_solr_replication_factor" : "1",
           "ranger_admin_username" : "amb_ranger_admin",
+		  "ranger_admin_password" : "password",
           "ranger_solr_shards" : "1",
           "ranger_pid_dir" : "/var/run/ranger",
           "create_db_dbuser" : "false",
@@ -1051,6 +1103,7 @@
           "case_insensitive_username_rules" : "false",
           "manage_identities" : "true",
           "password_chat_timeout" : "5",
+          "create_attributes_template" : "",
           "service_check_principal_name" : "${cluster_name|toLower()}-${short_date}",
           "ad_create_attributes_template" : "\n{\n  \"objectClass\": [\"top\", \"person\", \"organizationalPerson\", \"user\"],\n  \"cn\": \"$principal_name\",\n  #if( $is_service )\n  \"servicePrincipalName\": \"$principal_name\",\n  #end\n  \"userPrincipalName\": \"$normalized_principal\",\n  \"unicodePwd\": \"$password\",\n  \"accountExpires\": \"0\",\n  \"userAccountControl\": \"66048\"\n}",
           "install_packages" : "true",
@@ -1078,6 +1131,14 @@
         "properties" : {
           "ssl.client.truststore.type" : "jks",
           "ssl.client.truststore.location" : "/etc/security/clientKeys/all.jks"
+        }
+      }
+    },
+    {
+      "infra-solr-xml" : {
+        "properties_attributes" : { },
+        "properties" : {
+          "content" : "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<!--\nLicensed to the Apache Software Foundation (ASF) under one or more\ncontributor license agreements.  See the NOTICE file distributed with\nthis work for additional information regarding copyright ownership.\nThe ASF licenses this file to You under the Apache License, Version 2.0\n(the \"License\"); you may not use this file except in compliance with\nthe License.  You may obtain a copy of the License at\n\nhttp://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an \"AS IS\" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.\n-->\n<solr>\n  <solrcloud>\n    <str name=\"host\">${host:}</str>\n    <int name=\"hostPort\">${jetty.port:}</int>\n    <str name=\"hostContext\">${hostContext:solr}</str>\n    <int name=\"zkClientTimeout\">${zkClientTimeout:15000}</int>\n    <bool name=\"genericCoreNodeNames\">${genericCoreNodeNames:true}</bool>\n  </solrcloud>\n</solr>"
         }
       }
     },
@@ -1233,7 +1294,19 @@
           "name" : "SECONDARY_NAMENODE"
         },
         {
+          "name" : "MAPREDUCE2_CLIENT"
+        },
+        {
+          "name" : "YARN_CLIENT"
+        },
+        {
+          "name" : "HDFS_CLIENT"
+        },
+        {
           "name" : "METRICS_MONITOR"
+        },
+        {
+          "name" : "INFRA_SOLR_CLIENT"
         },
         {
           "name" : "KERBEROS_CLIENT"
@@ -1252,6 +1325,12 @@
     {
       "components" : [
         {
+          "name" : "MAPREDUCE2_CLIENT"
+        },
+        {
+          "name" : "YARN_CLIENT"
+        },
+        {
           "name" : "HDFS_CLIENT"
         },
         {
@@ -1265,6 +1344,9 @@
         },
         {
           "name" : "METRICS_MONITOR"
+        },
+        {
+          "name" : "INFRA_SOLR_CLIENT"
         },
         {
           "name" : "KERBEROS_CLIENT"
@@ -1298,13 +1380,19 @@
           "name" : "METRICS_MONITOR"
         },
         {
+          "name" : "INFRA_SOLR_CLIENT"
+        },
+        {
+          "name" : "ZOOKEEPER_CLIENT"
+        },
+        {
+          "name" : "INFRA_SOLR"
+        },
+        {
           "name" : "RANGER_USERSYNC"
         },
         {
           "name" : "KERBEROS_CLIENT"
-        },
-        {
-          "name" : "ZOOKEEPER_CLIENT"
         },
         {
           "name" : "METRICS_COLLECTOR"
@@ -1336,6 +1424,9 @@
         },
         {
           "name" : "METRICS_MONITOR"
+        },
+        {
+          "name" : "INFRA_SOLR_CLIENT"
         },
         {
           "name" : "KERBEROS_CLIENT"
@@ -1572,11 +1663,13 @@
               },
               {
                 "keytab" : {
-                  "configuration" : "infra-solr-env/infra_solr_web_kerberos_keytab"
+                  "configuration" : "infra-solr-env/infra_solr_web_kerberos_keytab",
+                  "file" : "${keytab_dir}/spnego.service.keytab"
                 },
                 "name" : "/spnego",
                 "principal" : {
-                  "configuration" : "infra-solr-env/infra_solr_web_kerberos_principal"
+                  "configuration" : "infra-solr-env/infra_solr_web_kerberos_principal",
+                  "value" : "HTTP/_HOST@${realm}"
                 },
                 "referencePath" : "AMBARI_INFRA//spnego"
               }

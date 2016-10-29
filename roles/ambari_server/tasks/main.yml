@@ -10,7 +10,15 @@
   yum: pkg={{ item }} state=present
   with_items:
     - ambari-server
+    - xorg-x11-xauth 
+    - firefox
 
+- name: Disabling ipv6 for SSHD
+  shell: 'echo "AddressFamily inet" >> /etc/ssh/sshd_config'
+  
+- name: Restarting SSHD
+  service: name=sshd enabled=yes state=restarted
+    
 - name: Copy JCE File to Ambari Server Resources
   copy: src=/vagrant/roles/ambari_server/files/jce_policy-8.zip dest=/var/lib/ambari-server/resources/
   
@@ -43,6 +51,12 @@
 
 - name: Restart PostgreSQL
   service: name=postgresql state=restarted enabled=yes
+  
+- name: Add testuser to support server
+  shell: 'ssh root@support.example.com useradd test'
+  
+- name: Add rangerhdfslookup to support server
+  shell: 'ssh root@support.example.com useradd rangerhdfslookup'
   
 - name: Delete Existing Blueprint
   shell: 'curl -XDELETE http://ambari.example.com:8080/api/v1/blueprints/Example -u admin:admin -v -H "X-Requested-By: ambari"'  
