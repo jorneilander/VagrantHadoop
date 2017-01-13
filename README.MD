@@ -24,8 +24,8 @@ To connect to Ambari using your browser:
 	+ Source Port: 8888
 	+ Destination: 10.1.0.2:8080
 	+ Click [Add]
-	
-Now when you brose to http://127.0.0.1:8888 after Ansible is done, Ambari should pop-up  
+
+Now when you browse to http://127.0.0.1:8888 after Ansible is done, Ambari should pop-up  
 Username and password are "admin"  
 
 Don't forget to scale your machines for your hardware in Vagrantfile
